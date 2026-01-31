@@ -1,6 +1,19 @@
-import type { Metadata } from "next";
+import type { Metadata, Viewport } from "next";
+import { Inter, JetBrains_Mono } from "next/font/google";
 import { ThemeProvider } from "@/components/theme-provider";
 import "./globals.css";
+
+const inter = Inter({
+  subsets: ["latin"],
+  display: "swap",
+  variable: "--font-inter",
+});
+
+const jetbrainsMono = JetBrains_Mono({
+  subsets: ["latin"],
+  display: "swap",
+  variable: "--font-mono",
+});
 
 export const metadata: Metadata = {
   title: "MVPMAKER.AI - Build MVPs at Lightning Speed",
@@ -25,14 +38,22 @@ export const metadata: Metadata = {
   },
 };
 
+export const viewport: Viewport = {
+  width: "device-width",
+  initialScale: 1,
+  maximumScale: 1,
+  userScalable: false,
+  viewportFit: "cover",
+};
+
 export default function RootLayout({
   children,
 }: Readonly<{
   children: React.ReactNode;
 }>) {
   return (
-    <html lang="en" suppressHydrationWarning>
-      <body className="antialiased" suppressHydrationWarning>
+    <html lang="en" suppressHydrationWarning className={`${inter.variable} ${jetbrainsMono.variable}`}>
+      <body className="antialiased font-sans" suppressHydrationWarning>
         <ThemeProvider>
           {/* Background effects */}
           <div className="cyber-grid" />
@@ -42,7 +63,7 @@ export default function RootLayout({
           <div className="scan-line" />
 
           {/* Main content */}
-          <div className="relative z-10 h-screen">{children}</div>
+          <main className="main-container">{children}</main>
         </ThemeProvider>
       </body>
     </html>
