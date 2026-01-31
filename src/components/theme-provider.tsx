@@ -46,21 +46,27 @@ export function useTheme() {
 export function ThemeSwitcher() {
   const { theme, setTheme } = useTheme();
 
-  const themes: { id: Theme; label: string }[] = [
-    { id: "black", label: "Black" },
-    { id: "white", label: "White" },
-    { id: "blue", label: "Blue" },
-    { id: "brutalist", label: "Brutalist" },
+  const themes: { id: Theme; color: string }[] = [
+    { id: "black", color: "#000" },
+    { id: "white", color: "#fff" },
+    { id: "blue", color: "#0070f3" },
+    { id: "brutalist", color: "#333" },
   ];
 
   return (
-    <div className="flex items-center gap-2">
+    <div className="flex items-center gap-1 p-1 rounded-lg bg-[var(--surface)] border border-[var(--border)]">
       {themes.map((t) => (
         <button
           key={t.id}
           onClick={() => setTheme(t.id)}
-          className={`theme-dot theme-dot-${t.id} ${theme === t.id ? "active" : ""}`}
-          title={t.label}
+          className={`w-4 h-4 rounded-full transition-all ${
+            theme === t.id ? "ring-1 ring-offset-1 ring-[var(--text-primary)] ring-offset-[var(--bg-primary)]" : ""
+          }`}
+          style={{
+            background: t.color,
+            border: t.id === "white" ? "1px solid #ddd" : "none"
+          }}
+          title={t.id}
         />
       ))}
     </div>

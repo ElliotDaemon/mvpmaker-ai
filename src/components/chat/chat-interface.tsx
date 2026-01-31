@@ -5,12 +5,12 @@ import { motion, AnimatePresence } from "framer-motion";
 import {
   Send,
   Paperclip,
-  Image,
+  ImageIcon,
   X,
-  Sparkles,
-  Bot,
-  User,
+  Terminal,
   Loader2,
+  ArrowRight,
+  Command,
 } from "lucide-react";
 
 export interface Message {
@@ -50,12 +50,10 @@ export function ChatInterface({
   const textareaRef = useRef<HTMLTextAreaElement>(null);
   const fileInputRef = useRef<HTMLInputElement>(null);
 
-  // Auto-scroll to bottom
   useEffect(() => {
     messagesEndRef.current?.scrollIntoView({ behavior: "smooth" });
   }, [messages, streamingContent]);
 
-  // Auto-resize textarea
   useEffect(() => {
     if (textareaRef.current) {
       textareaRef.current.style.height = "auto";
@@ -134,12 +132,11 @@ export function ChatInterface({
             initial={{ opacity: 0 }}
             animate={{ opacity: 1 }}
             exit={{ opacity: 0 }}
-            className="absolute inset-0 z-50 flex items-center justify-center bg-[var(--bg-primary)]/80 backdrop-blur-sm"
+            className="absolute inset-0 z-50 flex items-center justify-center bg-[var(--bg-primary)]/90 backdrop-blur-sm"
           >
-            <div className="flex flex-col items-center gap-4 p-8 rounded-2xl border-2 border-dashed border-[var(--accent)]">
-              <Image className="w-12 h-12 text-[var(--accent)]" />
-              <p className="text-lg font-medium">Drop your files here</p>
-              <p className="text-sm text-secondary">Images or reference files</p>
+            <div className="flex flex-col items-center gap-3 p-6 rounded-xl border border-dashed border-[var(--border-hover)]">
+              <ImageIcon className="w-8 h-8 text-[var(--text-tertiary)]" strokeWidth={1.5} />
+              <p className="text-sm font-medium">Drop files here</p>
             </div>
           </motion.div>
         )}
@@ -148,7 +145,7 @@ export function ChatInterface({
       {/* Messages */}
       <div className="chat-messages">
         {messages.length === 0 ? (
-          <WelcomeScreen />
+          <WelcomeScreen onExampleClick={(text) => setInput(text)} />
         ) : (
           <>
             {messages.map((message, index) => (
@@ -158,7 +155,6 @@ export function ChatInterface({
                 isLatest={index === messages.length - 1}
               />
             ))}
-            {/* Streaming message */}
             {isGenerating && streamingContent && (
               <MessageBubble
                 message={{
@@ -171,7 +167,6 @@ export function ChatInterface({
                 isLatest
               />
             )}
-            {/* Typing indicator */}
             {isGenerating && !streamingContent && <TypingIndicator />}
           </>
         )}
@@ -180,25 +175,24 @@ export function ChatInterface({
 
       {/* Input area */}
       <div className="chat-input-container">
-        {/* Attachments preview */}
         <AnimatePresence>
           {attachments.length > 0 && (
             <motion.div
               initial={{ opacity: 0, height: 0 }}
               animate={{ opacity: 1, height: "auto" }}
               exit={{ opacity: 0, height: 0 }}
-              className="flex gap-2 mb-3 flex-wrap"
+              className="flex gap-2 mb-3 flex-wrap max-w-[800px] mx-auto"
             >
               {attachments.map((attachment) => (
                 <motion.div
                   key={attachment.id}
-                  initial={{ opacity: 0, scale: 0.8 }}
+                  initial={{ opacity: 0, scale: 0.9 }}
                   animate={{ opacity: 1, scale: 1 }}
-                  exit={{ opacity: 0, scale: 0.8 }}
+                  exit={{ opacity: 0, scale: 0.9 }}
                   className="relative group"
                 >
                   {attachment.type === "image" ? (
-                    <div className="w-20 h-20 rounded-lg overflow-hidden border border-[var(--border)]">
+                    <div className="w-16 h-16 rounded-lg overflow-hidden border border-[var(--border)]">
                       <img
                         src={attachment.preview}
                         alt={attachment.name}
@@ -207,17 +201,17 @@ export function ChatInterface({
                     </div>
                   ) : (
                     <div className="flex items-center gap-2 px-3 py-2 rounded-lg bg-[var(--surface)] border border-[var(--border)]">
-                      <Paperclip className="w-4 h-4" />
-                      <span className="text-sm truncate max-w-[100px]">
+                      <Paperclip className="w-3.5 h-3.5" strokeWidth={1.5} />
+                      <span className="text-xs truncate max-w-[80px]">
                         {attachment.name}
                       </span>
                     </div>
                   )}
                   <button
                     onClick={() => removeAttachment(attachment.id)}
-                    className="absolute -top-2 -right-2 w-5 h-5 rounded-full bg-[var(--error)] text-white flex items-center justify-center opacity-0 group-hover:opacity-100 transition-opacity"
+                    className="absolute -top-1.5 -right-1.5 w-4 h-4 rounded-full bg-[var(--text-tertiary)] text-[var(--bg-primary)] flex items-center justify-center opacity-0 group-hover:opacity-100 transition-opacity"
                   >
-                    <X className="w-3 h-3" />
+                    <X className="w-2.5 h-2.5" strokeWidth={2} />
                   </button>
                 </motion.div>
               ))}
@@ -237,75 +231,120 @@ export function ChatInterface({
           <button
             className="upload-btn"
             onClick={() => fileInputRef.current?.click()}
+            title="Attach file"
           >
-            <Paperclip className="w-5 h-5" />
+            <Paperclip className="w-4 h-4" strokeWidth={1.5} />
           </button>
           <textarea
             ref={textareaRef}
             value={input}
             onChange={(e) => setInput(e.target.value)}
             onKeyDown={handleKeyDown}
-            placeholder="Describe your MVP idea... or upload a reference"
+            placeholder="Describe your MVP..."
             className="chat-input"
             rows={1}
           />
-          <button
-            className="send-btn"
-            onClick={handleSubmit}
-            disabled={(!input.trim() && attachments.length === 0) || isGenerating}
-          >
-            {isGenerating ? (
-              <Loader2 className="w-5 h-5 animate-spin" />
-            ) : (
-              <Send className="w-5 h-5" />
-            )}
-          </button>
+          <div className="flex items-center gap-1.5">
+            <span className="hidden sm:flex items-center gap-1 text-[10px] text-[var(--text-tertiary)] mr-1">
+              <Command className="w-3 h-3" strokeWidth={1.5} />
+              <span>Enter</span>
+            </span>
+            <button
+              className="send-btn"
+              onClick={handleSubmit}
+              disabled={(!input.trim() && attachments.length === 0) || isGenerating}
+            >
+              {isGenerating ? (
+                <Loader2 className="w-4 h-4 animate-spin" />
+              ) : (
+                <ArrowRight className="w-4 h-4" strokeWidth={2} />
+              )}
+            </button>
+          </div>
         </div>
       </div>
     </div>
   );
 }
 
-function WelcomeScreen() {
+function WelcomeScreen({ onExampleClick }: { onExampleClick: (text: string) => void }) {
+  const examples = [
+    { label: "SaaS dashboard", desc: "with analytics and user management" },
+    { label: "E-commerce store", desc: "with cart and checkout flow" },
+    { label: "Chat application", desc: "with real-time messaging" },
+    { label: "Task manager", desc: "with drag-and-drop boards" },
+  ];
+
   return (
     <motion.div
-      initial={{ opacity: 0, y: 20 }}
-      animate={{ opacity: 1, y: 0 }}
-      transition={{ duration: 0.6, ease: [0.16, 1, 0.3, 1] }}
-      className="flex flex-col items-center justify-center h-full text-center px-8"
+      initial={{ opacity: 0 }}
+      animate={{ opacity: 1 }}
+      transition={{ duration: 0.5 }}
+      className="flex flex-col items-center justify-center h-full px-6"
     >
+      {/* Logo mark */}
       <motion.div
-        initial={{ scale: 0 }}
-        animate={{ scale: 1 }}
-        transition={{ delay: 0.2, type: "spring", stiffness: 200 }}
-        className="w-20 h-20 rounded-2xl bg-gradient-to-br from-[var(--gradient-start)] to-[var(--gradient-end)] flex items-center justify-center mb-6 shadow-lg shadow-[var(--accent-glow)]"
+        initial={{ opacity: 0, y: 10 }}
+        animate={{ opacity: 1, y: 0 }}
+        transition={{ delay: 0.1 }}
+        className="mb-8"
       >
-        <Sparkles className="w-10 h-10 text-white" />
+        <div className="w-12 h-12 rounded-xl bg-[var(--surface)] border border-[var(--border)] flex items-center justify-center">
+          <Terminal className="w-5 h-5 text-[var(--text-secondary)]" strokeWidth={1.5} />
+        </div>
       </motion.div>
-      <h1 className="text-3xl font-bold mb-3 text-gradient">
-        Build Your MVP
-      </h1>
-      <p className="text-secondary max-w-md mb-8">
-        Describe your app idea and I&apos;ll build a complete, working MVP for you.
-        Upload reference images or just explain what you need.
-      </p>
-      <div className="grid grid-cols-1 sm:grid-cols-2 gap-3 max-w-lg w-full stagger-children">
-        {[
-          { icon: "🛒", text: "E-commerce store with payments" },
-          { icon: "📊", text: "Analytics dashboard" },
-          { icon: "💬", text: "Real-time chat application" },
-          { icon: "📝", text: "Task management tool" },
-        ].map((example, i) => (
-          <motion.div
+
+      {/* Heading */}
+      <motion.div
+        initial={{ opacity: 0, y: 10 }}
+        animate={{ opacity: 1, y: 0 }}
+        transition={{ delay: 0.15 }}
+        className="text-center mb-10"
+      >
+        <h1 className="text-2xl sm:text-3xl font-semibold tracking-tight mb-2">
+          What do you want to build?
+        </h1>
+        <p className="text-[var(--text-tertiary)] text-sm sm:text-base max-w-md">
+          Describe your idea and get a complete, working MVP in minutes.
+        </p>
+      </motion.div>
+
+      {/* Example prompts */}
+      <motion.div
+        initial={{ opacity: 0, y: 10 }}
+        animate={{ opacity: 1, y: 0 }}
+        transition={{ delay: 0.2 }}
+        className="grid grid-cols-1 sm:grid-cols-2 gap-2 w-full max-w-lg"
+      >
+        {examples.map((example, i) => (
+          <button
             key={i}
-            whileHover={{ scale: 1.02, x: 4 }}
-            className="flex items-center gap-3 p-4 rounded-xl bg-[var(--surface)] border border-[var(--border)] cursor-pointer transition-colors hover:bg-[var(--surface-hover)] hover:border-[var(--border-hover)]"
+            onClick={() => onExampleClick(`Build a ${example.label} ${example.desc}`)}
+            className="group flex items-center gap-3 px-4 py-3 rounded-lg border border-[var(--border)] bg-transparent hover:bg-[var(--surface)] hover:border-[var(--border-hover)] transition-all text-left"
           >
-            <span className="text-2xl">{example.icon}</span>
-            <span className="text-sm text-secondary">{example.text}</span>
-          </motion.div>
+            <div className="flex-1 min-w-0">
+              <span className="text-sm font-medium block">{example.label}</span>
+              <span className="text-xs text-[var(--text-tertiary)] block truncate">
+                {example.desc}
+              </span>
+            </div>
+            <ArrowRight
+              className="w-4 h-4 text-[var(--text-tertiary)] opacity-0 -translate-x-1 group-hover:opacity-100 group-hover:translate-x-0 transition-all"
+              strokeWidth={1.5}
+            />
+          </button>
         ))}
-      </div>
+      </motion.div>
+
+      {/* Hint */}
+      <motion.p
+        initial={{ opacity: 0 }}
+        animate={{ opacity: 1 }}
+        transition={{ delay: 0.3 }}
+        className="text-[var(--text-tertiary)] text-xs mt-8"
+      >
+        Or drop an image for reference
+      </motion.p>
     </motion.div>
   );
 }
@@ -321,19 +360,18 @@ function MessageBubble({
 
   return (
     <motion.div
-      initial={isLatest ? { opacity: 0, y: 20 } : false}
+      initial={isLatest ? { opacity: 0, y: 12 } : false}
       animate={{ opacity: 1, y: 0 }}
-      transition={{ duration: 0.4, ease: [0.16, 1, 0.3, 1] }}
+      transition={{ duration: 0.3, ease: "easeOut" }}
       className={`message ${isUser ? "message-user" : "message-ai"}`}
     >
       <div className="flex items-start gap-3">
         {!isUser && (
-          <div className="w-8 h-8 rounded-lg bg-gradient-to-br from-[var(--gradient-start)] to-[var(--gradient-end)] flex items-center justify-center flex-shrink-0">
-            <Bot className="w-4 h-4 text-white" />
+          <div className="w-7 h-7 rounded-lg bg-[var(--surface)] border border-[var(--border)] flex items-center justify-center flex-shrink-0">
+            <Terminal className="w-3.5 h-3.5 text-[var(--text-secondary)]" strokeWidth={1.5} />
           </div>
         )}
-        <div className="flex-1">
-          {/* Attachments */}
+        <div className="flex-1 min-w-0">
           {message.attachments && message.attachments.length > 0 && (
             <div className="flex gap-2 mb-2 flex-wrap">
               {message.attachments.map((attachment) => (
@@ -345,12 +383,12 @@ function MessageBubble({
                     <img
                       src={attachment.preview}
                       alt={attachment.name}
-                      className="max-w-[200px] max-h-[200px] object-cover"
+                      className="max-w-[180px] max-h-[180px] object-cover"
                     />
                   ) : (
                     <div className="flex items-center gap-2 px-3 py-2 bg-[var(--surface)]">
-                      <Paperclip className="w-4 h-4" />
-                      <span className="text-sm">{attachment.name}</span>
+                      <Paperclip className="w-3.5 h-3.5" strokeWidth={1.5} />
+                      <span className="text-xs">{attachment.name}</span>
                     </div>
                   )}
                 </div>
@@ -360,13 +398,13 @@ function MessageBubble({
           <div className="message-bubble">
             <p className="whitespace-pre-wrap">{message.content}</p>
             {message.isStreaming && (
-              <span className="inline-block w-2 h-4 ml-1 bg-current animate-pulse" />
+              <span className="inline-block w-0.5 h-4 ml-0.5 bg-current animate-pulse" />
             )}
           </div>
         </div>
         {isUser && (
-          <div className="w-8 h-8 rounded-lg bg-[var(--surface-active)] flex items-center justify-center flex-shrink-0">
-            <User className="w-4 h-4" />
+          <div className="w-7 h-7 rounded-lg bg-[var(--surface)] border border-[var(--border)] flex items-center justify-center flex-shrink-0">
+            <span className="text-xs font-medium">You</span>
           </div>
         )}
       </div>
@@ -377,13 +415,13 @@ function MessageBubble({
 function TypingIndicator() {
   return (
     <motion.div
-      initial={{ opacity: 0, y: 20 }}
+      initial={{ opacity: 0, y: 12 }}
       animate={{ opacity: 1, y: 0 }}
       className="message message-ai"
     >
       <div className="flex items-start gap-3">
-        <div className="w-8 h-8 rounded-lg bg-gradient-to-br from-[var(--gradient-start)] to-[var(--gradient-end)] flex items-center justify-center flex-shrink-0">
-          <Bot className="w-4 h-4 text-white" />
+        <div className="w-7 h-7 rounded-lg bg-[var(--surface)] border border-[var(--border)] flex items-center justify-center flex-shrink-0">
+          <Terminal className="w-3.5 h-3.5 text-[var(--text-secondary)]" strokeWidth={1.5} />
         </div>
         <div className="message-bubble">
           <div className="typing-indicator">

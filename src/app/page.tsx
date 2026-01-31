@@ -3,13 +3,13 @@
 import { useState, useCallback, useRef, useEffect } from "react";
 import { motion, AnimatePresence } from "framer-motion";
 import {
-  Zap,
+  Terminal,
   PanelRightOpen,
   PanelRightClose,
   Download,
   Code,
   X,
-  ChevronUp,
+  ChevronDown,
 } from "lucide-react";
 import { ChatInterface, Message, Attachment } from "@/components/chat/chat-interface";
 import { PreviewPanel, GeneratedFile } from "@/components/preview/preview-panel";
@@ -260,84 +260,51 @@ export default function Home() {
       {/* Main Content */}
       <div className="flex-1 flex flex-col h-full overflow-hidden">
         {/* Header */}
-        <header className="flex items-center justify-between px-4 sm:px-6 py-3 sm:py-4 border-b border-[var(--border)] bg-[var(--surface)]/50 backdrop-blur-xl reactive-glow">
-          <div className="flex items-center gap-3 sm:gap-4">
-            <motion.div
-              initial={{ scale: 0 }}
-              animate={{ scale: 1 }}
-              transition={{ type: "spring", stiffness: 200 }}
-              className="w-9 h-9 sm:w-10 sm:h-10 rounded-xl bg-gradient-to-br from-[var(--gradient-start)] to-[var(--gradient-end)] flex items-center justify-center shadow-lg shadow-[var(--accent-glow)]"
-            >
-              <Zap className="w-4 h-4 sm:w-5 sm:h-5 text-white" />
-            </motion.div>
-            <div>
-              <h1 className="text-base sm:text-lg font-semibold">MVPMAKER.AI</h1>
-              <p className="text-xs text-secondary hidden sm:block">Build MVPs at lightning speed</p>
+        <header className="flex items-center justify-between px-4 sm:px-5 h-12 border-b border-[var(--border)] bg-[var(--bg-primary)]">
+          <div className="flex items-center gap-2.5">
+            <div className="w-7 h-7 rounded-lg bg-[var(--surface)] border border-[var(--border)] flex items-center justify-center">
+              <Terminal className="w-3.5 h-3.5 text-[var(--text-secondary)]" strokeWidth={1.5} />
             </div>
+            <span className="text-sm font-medium tracking-tight">mvpmaker</span>
           </div>
 
-          <div className="flex items-center gap-2 sm:gap-3">
-            {/* Mobile progress indicator */}
+          <div className="flex items-center gap-2">
+            {/* Build status */}
             {isBuilding && (
-              <motion.div
-                initial={{ opacity: 0, scale: 0.8 }}
-                animate={{ opacity: 1, scale: 1 }}
-                className="flex sm:hidden items-center gap-1.5 px-2.5 py-1.5 rounded-full bg-[var(--accent)]/10 border border-[var(--accent)]/20"
-              >
-                <div className="w-1.5 h-1.5 rounded-full bg-[var(--accent)] animate-pulse" />
-                <span className="text-xs font-medium text-[var(--accent)]">
-                  {Math.round(progress)}%
+              <div className="flex items-center gap-2 px-2.5 py-1 rounded-md bg-[var(--surface)] border border-[var(--border)]">
+                <div className="w-1.5 h-1.5 rounded-full bg-emerald-500 animate-pulse" />
+                <span className="text-xs text-[var(--text-secondary)]">
+                  Building {Math.round(progress)}%
                 </span>
-              </motion.div>
-            )}
-
-            {/* Desktop build status */}
-            {isBuilding && (
-              <motion.div
-                initial={{ opacity: 0, x: 20 }}
-                animate={{ opacity: 1, x: 0 }}
-                className="hidden md:flex items-center gap-2 px-4 py-2 rounded-full bg-[var(--accent)]/10 border border-[var(--accent)]/20"
-              >
-                <div className="w-2 h-2 rounded-full bg-[var(--accent)] animate-pulse" />
-                <span className="text-sm text-[var(--accent)]">
-                  {currentStep || "Building..."}
-                </span>
-                <span className="text-xs font-medium text-[var(--accent)]">
-                  {Math.round(progress)}%
-                </span>
-              </motion.div>
+              </div>
             )}
 
             {/* Download button */}
             {generatedFiles.length > 0 && (
-              <motion.button
-                initial={{ opacity: 0, scale: 0.8 }}
-                animate={{ opacity: 1, scale: 1 }}
+              <button
                 onClick={handleDownload}
-                className="btn btn-secondary text-xs sm:text-sm py-2 px-3 sm:px-4"
+                className="flex items-center gap-1.5 px-2.5 py-1 rounded-md bg-[var(--surface)] border border-[var(--border)] hover:bg-[var(--surface-hover)] transition-colors text-xs"
               >
-                <Download className="w-4 h-4" />
-                <span className="hidden sm:inline">Download</span>
-              </motion.button>
+                <Download className="w-3.5 h-3.5" strokeWidth={1.5} />
+                <span className="hidden sm:inline">Export</span>
+              </button>
             )}
 
             {/* Toggle preview panel - Desktop */}
             <button
               onClick={() => setShowPreview(!showPreview)}
-              className="btn btn-ghost btn-icon hidden lg:flex"
+              className="w-7 h-7 rounded-md flex items-center justify-center hover:bg-[var(--surface)] transition-colors hidden lg:flex"
               title={showPreview ? "Hide preview" : "Show preview"}
             >
               {showPreview ? (
-                <PanelRightClose className="w-5 h-5" />
+                <PanelRightClose className="w-4 h-4 text-[var(--text-tertiary)]" strokeWidth={1.5} />
               ) : (
-                <PanelRightOpen className="w-5 h-5" />
+                <PanelRightOpen className="w-4 h-4 text-[var(--text-tertiary)]" strokeWidth={1.5} />
               )}
             </button>
 
             {/* Theme switcher */}
-            <div className="theme-switcher">
-              <ThemeSwitcher />
-            </div>
+            <ThemeSwitcher />
           </div>
         </header>
 
