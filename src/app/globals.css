@@ -1172,21 +1172,421 @@ body {
 .text-tertiary { color: var(--text-tertiary); }
 
 /* ============================================
-   Responsive Helpers
+   Mobile Responsive Design
    ============================================ */
 
+/* Large tablets and below */
 @media (max-width: 1024px) {
   .preview-container {
     display: none;
   }
+
+  .progress-steps {
+    display: grid;
+    grid-template-columns: repeat(3, 1fr);
+    gap: 8px;
+  }
+
+  .progress-step {
+    flex-direction: column;
+    text-align: center;
+    padding: 8px;
+    background: var(--surface);
+    border-radius: 8px;
+  }
+
+  .progress-step .flex-1 {
+    width: 100%;
+  }
+
+  .progress-step .text-sm {
+    font-size: 11px;
+    white-space: nowrap;
+    overflow: hidden;
+    text-overflow: ellipsis;
+  }
 }
 
+/* Tablets */
 @media (max-width: 768px) {
+  .chat-messages {
+    padding: 16px;
+  }
+
+  .chat-input-container {
+    padding: 12px 16px 16px;
+  }
+
   .chat-input-wrapper {
     padding: 12px;
+    border-radius: 14px;
+  }
+
+  .chat-input {
+    font-size: 16px; /* Prevents iOS zoom on focus */
+  }
+
+  .message {
+    max-width: 92%;
+  }
+
+  .message-bubble {
+    padding: 12px 16px;
+    font-size: 14px;
+  }
+
+  .progress-container {
+    padding: 16px;
+  }
+
+  .progress-steps {
+    grid-template-columns: repeat(3, 1fr);
+    gap: 6px;
+  }
+
+  .progress-step .text-sm {
+    font-size: 10px;
+  }
+
+  .progress-step-icon {
+    width: 18px;
+    height: 18px;
+    font-size: 9px;
+  }
+
+  .decision-container {
+    padding: 16px;
+  }
+
+  .decision-option {
+    padding: 14px;
+    gap: 12px;
+  }
+
+  .decision-option-icon {
+    width: 40px;
+    height: 40px;
+    font-size: 20px;
+  }
+
+  .btn {
+    padding: 10px 16px;
+    font-size: 13px;
+  }
+
+  .btn-icon {
+    width: 36px;
+    height: 36px;
+  }
+
+  .theme-switcher {
+    padding: 6px;
+    gap: 6px;
+  }
+
+  .theme-dot {
+    width: 18px;
+    height: 18px;
+  }
+}
+
+/* Mobile phones */
+@media (max-width: 480px) {
+  .cyber-grid {
+    background-size: 40px 40px;
+  }
+
+  .ambient-orb-1 {
+    width: 300px;
+    height: 300px;
+  }
+
+  .ambient-orb-2,
+  .ambient-orb-3 {
+    display: none;
+  }
+
+  .chat-messages {
+    padding: 12px;
+  }
+
+  .chat-input-container {
+    padding: 10px 12px 14px;
+  }
+
+  .chat-input-wrapper {
+    padding: 10px;
+    gap: 8px;
+  }
+
+  .upload-btn,
+  .send-btn {
+    width: 36px;
+    height: 36px;
+    border-radius: 8px;
   }
 
   .message {
     max-width: 95%;
+    margin-bottom: 12px;
+  }
+
+  .message-bubble {
+    padding: 10px 14px;
+    font-size: 14px;
+    border-radius: 14px;
+  }
+
+  .message-user .message-bubble {
+    border-bottom-right-radius: 4px;
+  }
+
+  .message-ai .message-bubble {
+    border-bottom-left-radius: 4px;
+  }
+
+  .progress-container {
+    padding: 12px;
+  }
+
+  .progress-header {
+    margin-bottom: 8px;
+  }
+
+  .progress-title {
+    font-size: 13px;
+  }
+
+  .progress-steps {
+    grid-template-columns: repeat(3, 1fr);
+    gap: 4px;
+    margin-top: 10px;
+  }
+
+  .progress-step {
+    padding: 6px 4px;
+    gap: 4px;
+  }
+
+  .progress-step .text-sm {
+    font-size: 9px;
+  }
+
+  .progress-step-icon {
+    width: 16px;
+    height: 16px;
+  }
+
+  .glass-panel {
+    border-radius: 16px;
+  }
+
+  .decision-container {
+    padding: 12px;
+  }
+
+  .decision-question {
+    font-size: 14px;
+    margin-bottom: 14px;
+  }
+
+  .decision-options {
+    gap: 8px;
+  }
+
+  .decision-option {
+    padding: 12px;
+    border-radius: 12px;
+  }
+
+  .decision-option-icon {
+    width: 36px;
+    height: 36px;
+    font-size: 18px;
+    border-radius: 10px;
+  }
+
+  .decision-option-title {
+    font-size: 13px;
+  }
+
+  .decision-option-desc {
+    font-size: 11px;
+  }
+
+  /* Mobile header adjustments */
+  .mobile-header {
+    padding: 12px 16px;
+  }
+
+  .mobile-header h1 {
+    font-size: 16px;
+  }
+
+  .mobile-header p {
+    display: none;
+  }
+
+  /* Mobile file viewer */
+  .file-tree {
+    padding: 12px;
+  }
+
+  .file-tree-item {
+    padding: 10px;
+    font-size: 12px;
+  }
+
+  .code-editor {
+    font-size: 11px;
+    line-height: 1.5;
+  }
+
+  .code-editor-header {
+    padding: 10px 12px;
+  }
+
+  .code-editor-content {
+    padding: 12px;
+  }
+}
+
+/* Mobile-specific touch improvements */
+@media (hover: none) and (pointer: coarse) {
+  .btn:active {
+    transform: scale(0.95);
+  }
+
+  .decision-option:active {
+    transform: scale(0.98);
+  }
+
+  .file-tree-item:active {
+    background: var(--surface-active);
+  }
+
+  /* Larger touch targets */
+  .upload-btn,
+  .send-btn {
+    min-width: 44px;
+    min-height: 44px;
+  }
+
+  .theme-dot {
+    min-width: 24px;
+    min-height: 24px;
+  }
+}
+
+/* Mobile bottom sheet for preview */
+.mobile-preview-sheet {
+  position: fixed;
+  bottom: 0;
+  left: 0;
+  right: 0;
+  z-index: 100;
+  max-height: 70vh;
+  background: var(--bg-primary);
+  border-top-left-radius: 20px;
+  border-top-right-radius: 20px;
+  border: 1px solid var(--border);
+  border-bottom: none;
+  overflow: hidden;
+  box-shadow: 0 -10px 40px -10px rgba(0, 0, 0, 0.3);
+}
+
+.mobile-preview-sheet-header {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  padding: 16px 20px;
+  border-bottom: 1px solid var(--border);
+}
+
+.mobile-preview-sheet-handle {
+  width: 40px;
+  height: 4px;
+  background: var(--border);
+  border-radius: 2px;
+  margin: 0 auto 12px;
+}
+
+.mobile-preview-sheet-content {
+  overflow-y: auto;
+  max-height: calc(70vh - 60px);
+}
+
+/* Mobile floating action button */
+.mobile-fab {
+  position: fixed;
+  bottom: 100px;
+  right: 16px;
+  width: 56px;
+  height: 56px;
+  border-radius: 16px;
+  background: linear-gradient(135deg, var(--gradient-start), var(--gradient-end));
+  color: white;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  box-shadow: 0 8px 24px -4px var(--accent-glow);
+  z-index: 50;
+  border: none;
+  cursor: pointer;
+  transition: all 0.3s ease;
+}
+
+.mobile-fab:active {
+  transform: scale(0.9);
+}
+
+/* Safe area support for notched phones */
+@supports (padding-bottom: env(safe-area-inset-bottom)) {
+  .chat-input-container {
+    padding-bottom: calc(16px + env(safe-area-inset-bottom));
+  }
+
+  .mobile-preview-sheet {
+    padding-bottom: env(safe-area-inset-bottom);
+  }
+}
+
+/* Landscape mode adjustments */
+@media (max-height: 500px) and (orientation: landscape) {
+  .chat-messages {
+    padding: 8px 16px;
+  }
+
+  .chat-input-container {
+    padding: 8px 16px;
+  }
+
+  .message {
+    margin-bottom: 8px;
+  }
+
+  .message-bubble {
+    padding: 8px 12px;
+  }
+
+  .progress-container {
+    padding: 8px 16px;
+  }
+
+  .progress-steps {
+    display: none;
+  }
+}
+
+/* Dark mode text legibility on mobile */
+@media (max-width: 768px) {
+  :root {
+    --text-secondary: rgba(255, 255, 255, 0.75);
+    --text-tertiary: rgba(255, 255, 255, 0.5);
+  }
+
+  [data-theme="white"] {
+    --text-secondary: rgba(15, 23, 42, 0.75);
+    --text-tertiary: rgba(15, 23, 42, 0.55);
   }
 }

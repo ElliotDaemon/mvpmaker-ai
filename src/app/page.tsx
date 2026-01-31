@@ -7,6 +7,9 @@ import {
   PanelRightOpen,
   PanelRightClose,
   Download,
+  Code,
+  X,
+  ChevronUp,
 } from "lucide-react";
 import { ChatInterface, Message, Attachment } from "@/components/chat/chat-interface";
 import { PreviewPanel, GeneratedFile } from "@/components/preview/preview-panel";
@@ -30,6 +33,7 @@ export default function Home() {
   const [generatedFiles, setGeneratedFiles] = useState<GeneratedFile[]>([]);
   const [previewUrl] = useState<string | undefined>();
   const [showPreview, setShowPreview] = useState(true);
+  const [showMobilePreview, setShowMobilePreview] = useState(false);
 
   // Build progress state
   const [buildSteps, setBuildSteps] = useState<BuildStep[]>(initializeBuildSteps());
@@ -224,24 +228,38 @@ export default function Home() {
       {/* Main Content */}
       <div className="flex-1 flex flex-col h-full overflow-hidden">
         {/* Header */}
-        <header className="flex items-center justify-between px-6 py-4 border-b border-[var(--border)] bg-[var(--surface)]/50 backdrop-blur-xl">
-          <div className="flex items-center gap-4">
+        <header className="flex items-center justify-between px-4 sm:px-6 py-3 sm:py-4 border-b border-[var(--border)] bg-[var(--surface)]/50 backdrop-blur-xl">
+          <div className="flex items-center gap-3 sm:gap-4">
             <motion.div
               initial={{ scale: 0 }}
               animate={{ scale: 1 }}
               transition={{ type: "spring", stiffness: 200 }}
-              className="w-10 h-10 rounded-xl bg-gradient-to-br from-[var(--gradient-start)] to-[var(--gradient-end)] flex items-center justify-center shadow-lg shadow-[var(--accent-glow)]"
+              className="w-9 h-9 sm:w-10 sm:h-10 rounded-xl bg-gradient-to-br from-[var(--gradient-start)] to-[var(--gradient-end)] flex items-center justify-center shadow-lg shadow-[var(--accent-glow)]"
             >
-              <Zap className="w-5 h-5 text-white" />
+              <Zap className="w-4 h-4 sm:w-5 sm:h-5 text-white" />
             </motion.div>
             <div>
-              <h1 className="text-lg font-semibold">MVPMAKER.AI</h1>
-              <p className="text-xs text-secondary">Build MVPs at lightning speed</p>
+              <h1 className="text-base sm:text-lg font-semibold">MVPMAKER.AI</h1>
+              <p className="text-xs text-secondary hidden sm:block">Build MVPs at lightning speed</p>
             </div>
           </div>
 
-          <div className="flex items-center gap-3">
-            {/* Build status */}
+          <div className="flex items-center gap-2 sm:gap-3">
+            {/* Mobile progress indicator */}
+            {isBuilding && (
+              <motion.div
+                initial={{ opacity: 0, scale: 0.8 }}
+                animate={{ opacity: 1, scale: 1 }}
+                className="flex sm:hidden items-center gap-1.5 px-2.5 py-1.5 rounded-full bg-[var(--accent)]/10 border border-[var(--accent)]/20"
+              >
+                <div className="w-1.5 h-1.5 rounded-full bg-[var(--accent)] animate-pulse" />
+                <span className="text-xs font-medium text-[var(--accent)]">
+                  {Math.round(progress)}%
+                </span>
+              </motion.div>
+            )}
+
+            {/* Desktop build status */}
             {isBuilding && (
               <motion.div
                 initial={{ opacity: 0, x: 20 }}
@@ -264,14 +282,14 @@ export default function Home() {
                 initial={{ opacity: 0, scale: 0.8 }}
                 animate={{ opacity: 1, scale: 1 }}
                 onClick={handleDownload}
-                className="btn btn-secondary"
+                className="btn btn-secondary text-xs sm:text-sm py-2 px-3 sm:px-4"
               >
                 <Download className="w-4 h-4" />
                 <span className="hidden sm:inline">Download</span>
               </motion.button>
             )}
 
-            {/* Toggle preview panel */}
+            {/* Toggle preview panel - Desktop */}
             <button
               onClick={() => setShowPreview(!showPreview)}
               className="btn btn-ghost btn-icon hidden lg:flex"
@@ -328,7 +346,7 @@ export default function Home() {
             </div>
           </div>
 
-          {/* Preview Panel */}
+          {/* Preview Panel - Desktop */}
           <AnimatePresence>
             {showPreview && (
               <motion.div
@@ -352,6 +370,86 @@ export default function Home() {
           </AnimatePresence>
         </div>
       </div>
+
+      {/* Mobile FAB for viewing code */}
+      {generatedFiles.length > 0 && (
+        <motion.button
+          initial={{ opacity: 0, scale: 0 }}
+          animate={{ opacity: 1, scale: 1 }}
+          exit={{ opacity: 0, scale: 0 }}
+          onClick={() => setShowMobilePreview(true)}
+          className="mobile-fab lg:hidden"
+        >
+          <Code className="w-6 h-6" />
+          {generatedFiles.length > 0 && (
+            <span className="absolute -top-1 -right-1 w-5 h-5 rounded-full bg-[var(--success)] text-white text-xs flex items-center justify-center font-medium">
+              {generatedFiles.length}
+            </span>
+          )}
+        </motion.button>
+      )}
+
+      {/* Mobile Preview Sheet */}
+      <AnimatePresence>
+        {showMobilePreview && (
+          <>
+            {/* Backdrop */}
+            <motion.div
+              initial={{ opacity: 0 }}
+              animate={{ opacity: 1 }}
+              exit={{ opacity: 0 }}
+              onClick={() => setShowMobilePreview(false)}
+              className="fixed inset-0 bg-black/50 backdrop-blur-sm z-[99] lg:hidden"
+            />
+
+            {/* Sheet */}
+            <motion.div
+              initial={{ y: "100%" }}
+              animate={{ y: 0 }}
+              exit={{ y: "100%" }}
+              transition={{ type: "spring", damping: 25, stiffness: 300 }}
+              className="mobile-preview-sheet lg:hidden"
+            >
+              {/* Handle */}
+              <div className="mobile-preview-sheet-handle" />
+
+              {/* Header */}
+              <div className="mobile-preview-sheet-header">
+                <div className="flex items-center gap-2">
+                  <Code className="w-5 h-5 text-[var(--accent)]" />
+                  <span className="font-medium">Generated Files</span>
+                  <span className="text-xs text-secondary">({generatedFiles.length})</span>
+                </div>
+                <button
+                  onClick={() => setShowMobilePreview(false)}
+                  className="btn btn-ghost btn-icon"
+                >
+                  <X className="w-5 h-5" />
+                </button>
+              </div>
+
+              {/* Content */}
+              <div className="mobile-preview-sheet-content">
+                <PreviewPanel
+                  files={generatedFiles}
+                  isGenerating={isGenerating}
+                  currentStep={currentStep}
+                  progress={progress}
+                  previewUrl={previewUrl}
+                />
+              </div>
+
+              {/* Swipe indicator */}
+              <div className="absolute bottom-4 left-0 right-0 flex justify-center">
+                <div className="flex items-center gap-1 text-xs text-tertiary">
+                  <ChevronUp className="w-4 h-4" />
+                  <span>Swipe down to close</span>
+                </div>
+              </div>
+            </motion.div>
+          </>
+        )}
+      </AnimatePresence>
     </div>
   );
 }
