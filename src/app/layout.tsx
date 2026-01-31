@@ -1,4 +1,4 @@
-import type { Metadata } from "next";
+import type { Metadata, Viewport } from "next";
 import { ThemeProvider } from "@/components/theme-provider";
 import "./globals.css";
 
@@ -25,6 +25,14 @@ export const metadata: Metadata = {
   },
 };
 
+export const viewport: Viewport = {
+  width: "device-width",
+  initialScale: 1,
+  maximumScale: 1,
+  userScalable: false,
+  viewportFit: "cover",
+};
+
 export default function RootLayout({
   children,
 }: Readonly<{
@@ -42,7 +50,7 @@ export default function RootLayout({
           <div className="scan-line" />
 
           {/* Main content */}
-          <div className="relative z-10 h-screen">{children}</div>
+          <main className="main-container">{children}</main>
         </ThemeProvider>
       </body>
     </html>

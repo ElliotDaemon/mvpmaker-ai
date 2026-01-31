@@ -125,6 +125,7 @@
 
 html, body {
   height: 100%;
+  height: 100dvh; /* Dynamic viewport height for mobile */
   overflow: hidden;
 }
 
@@ -132,6 +133,24 @@ body {
   background: var(--bg-primary);
   color: var(--text-primary);
   font-family: var(--font-sans), -apple-system, BlinkMacSystemFont, system-ui, sans-serif;
+}
+
+/* Main container - fixes mobile viewport issues */
+.main-container {
+  position: relative;
+  z-index: 10;
+  height: 100%;
+  height: 100dvh;
+  display: flex;
+  flex-direction: column;
+  padding-top: env(safe-area-inset-top);
+}
+
+/* Mobile header fix */
+@supports (padding-top: env(safe-area-inset-top)) {
+  .main-container {
+    padding-top: env(safe-area-inset-top);
+  }
 }
 
 /* ============================================
