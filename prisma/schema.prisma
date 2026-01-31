@@ -1,0 +1,93 @@
+generator client {
+  provider = "prisma-client-js"
+  output   = "../src/generated/prisma"
+}
+
+datasource db {
+  provider = "postgresql"
+}
+
+// Users and authentication
+model User {
+  id        String   @id @default(cuid())
+  email     String   @unique
+  name      String?
+  avatar    String?
+  tier      Tier     @default(FREE)
+  credits   Int      @default(3)
+  createdAt DateTime @default(now())
+  updatedAt DateTime @updatedAt
+
+  projects  Project[]
+}
+
+// MVP Projects
+model Project {
+  id          String        @id @default(cuid())
+  name        String
+  description String?
+  prompt      String        // Original user prompt
+  status      ProjectStatus @default(GENERATING)
+  createdAt   DateTime      @default(now())
+  updatedAt   DateTime      @updatedAt
+
+  userId      String
+  user        User          @relation(fields: [userId], references: [id], onDelete: Cascade)
+
+  files       File[]
+  generations Generation[]
+}
+
+// Generated files for each project
+model File {
+  id        String   @id @default(cuid())
+  path      String   // e.g., "src/app/page.tsx"
+  content   String   // File content
+  language  String   // e.g., "typescript", "css"
+  createdAt DateTime @default(now())
+  updatedAt DateTime @updatedAt
+
+  projectId String
+  project   Project  @relation(fields: [projectId], references: [id], onDelete: Cascade)
+
+  @@unique([projectId, path])
+}
+
+// AI generation runs
+model Generation {
+  id          String           @id @default(cuid())
+  provider    String           // claude, groq, deepseek, etc.
+  model       String           // specific model used
+  prompt      String           // what was sent
+  output      String?          // what was generated
+  tokens      Int?             // tokens used
+  cost        Float?           // cost in USD
+  status      GenerationStatus @default(PENDING)
+  startedAt   DateTime         @default(now())
+  completedAt DateTime?
+  error       String?
+
+  projectId   String
+  project     Project          @relation(fields: [projectId], references: [id], onDelete: Cascade)
+}
+
+enum Tier {
+  FREE
+  BUILDER
+  PRO
+  ENTERPRISE
+}
+
+enum ProjectStatus {
+  GENERATING
+  READY
+  DEPLOYED
+  FAILED
+}
+
+enum GenerationStatus {
+  PENDING
+  RUNNING
+  COMPLETED
+  FAILED
+}
