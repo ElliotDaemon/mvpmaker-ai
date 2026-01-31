@@ -1,5 +1,6 @@
 import type { Metadata } from "next";
 import { Geist, Geist_Mono } from "next/font/google";
+import { ThemeProvider } from "@/components/theme-provider";
 import "./globals.css";
 
 const geistSans = Geist({
@@ -29,8 +30,13 @@ export default function RootLayout({
         className={`${geistSans.variable} ${geistMono.variable} antialiased`}
         suppressHydrationWarning
       >
-        <div className="animated-bg" />
-        {children}
+        <ThemeProvider>
+          <div className="grid-bg" />
+          <div className="ambient-glow" />
+          <div className="relative z-10 h-screen">
+            {children}
+          </div>
+        </ThemeProvider>
       </body>
     </html>
   );

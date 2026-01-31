@@ -1,334 +1,310 @@
 "use client";
 
 import { useState } from "react";
-import { motion } from "framer-motion";
 import {
+  LayoutDashboard,
+  FolderKanban,
+  ListTodo,
+  Users,
+  Settings,
+  ChevronLeft,
+  Plus,
+  Search,
   Sparkles,
+  X,
   Zap,
-  Code2,
-  Layers,
-  Upload,
-  ArrowRight,
-  Play,
-  Cpu,
-  Globe,
-  Rocket,
-  Check,
 } from "lucide-react";
-import { Header } from "@/components/header";
-import { Button } from "@/components/ui/button";
-import { GlassCard } from "@/components/ui/glass-card";
-import { Textarea } from "@/components/ui/input";
-import Link from "next/link";
+import { ThemeSwitcher } from "@/components/theme-provider";
 
-const features = [
+interface Project {
+  id: string;
+  name: string;
+  description: string;
+  status: "active" | "completed" | "archived";
+  updatedAt: string;
+}
+
+const mockProjects: Project[] = [
   {
-    icon: Zap,
-    title: "Lightning Fast",
-    description: "Generate complete MVPs in minutes, not weeks. Our AI understands your vision instantly.",
+    id: "1",
+    name: "Project Alpha",
+    description: "E-commerce platform with AI-powered recommendations and real-time inventory management",
+    status: "active",
+    updatedAt: "2 hours ago",
   },
   {
-    icon: Code2,
-    title: "Production Ready",
-    description: "Clean, scalable code with best practices. Deploy directly to Vercel or Netlify.",
+    id: "2",
+    name: "Task Beta",
+    description: "Project management tool with Kanban boards and team collaboration features",
+    status: "active",
+    updatedAt: "5 hours ago",
   },
   {
-    icon: Layers,
-    title: "Full Stack",
-    description: "Frontend, backend, database - everything you need in one seamless package.",
+    id: "3",
+    name: "Team Gamma",
+    description: "Internal communication platform with video conferencing and file sharing",
+    status: "completed",
+    updatedAt: "1 day ago",
   },
   {
-    icon: Globe,
-    title: "Live Preview",
-    description: "Watch your app come to life in real-time as the AI generates code.",
+    id: "4",
+    name: "Project Beta",
+    description: "Customer support ticketing system with AI chatbot integration",
+    status: "active",
+    updatedAt: "2 days ago",
   },
 ];
 
-const tiers = [
-  {
-    name: "Explorer",
-    price: "Free",
-    description: "Perfect for trying out ideas",
-    features: ["3 MVPs per month", "Basic templates", "Community support", "Groq AI (fastest)"],
-    cta: "Start Free",
-    popular: false,
-  },
-  {
-    name: "Builder",
-    price: "$19",
-    period: "/mo",
-    description: "For serious builders",
-    features: [
-      "Unlimited MVPs",
-      "All templates",
-      "Priority queue",
-      "Multiple AI models",
-      "GitHub integration",
-    ],
-    cta: "Get Started",
-    popular: true,
-  },
-  {
-    name: "Pro",
-    price: "$49",
-    period: "/mo",
-    description: "Maximum quality & speed",
-    features: [
-      "Everything in Builder",
-      "Claude Sonnet (best quality)",
-      "Custom domains",
-      "Team collaboration",
-      "API access",
-    ],
-    cta: "Go Pro",
-    popular: false,
-  },
+const navItems = [
+  { icon: LayoutDashboard, label: "Dashboard", id: "dashboard" },
+  { icon: FolderKanban, label: "Projects", id: "projects" },
+  { icon: ListTodo, label: "Tasks", id: "tasks" },
+  { icon: Users, label: "Team", id: "team" },
+  { icon: Settings, label: "Settings", id: "settings" },
 ];
+
+const filters = ["All", "Active", "Completed", "Archived"];
 
 export default function Home() {
-  const [prompt, setPrompt] = useState("");
-  const [isHovered, setIsHovered] = useState(false);
+  const [activeNav, setActiveNav] = useState("projects");
+  const [activeFilter, setActiveFilter] = useState("All");
+  const [selectedProject, setSelectedProject] = useState<string | null>("1");
+  const [sidebarCollapsed, setSidebarCollapsed] = useState(false);
+
+  const filteredProjects = mockProjects.filter((p) => {
+    if (activeFilter === "All") return true;
+    return p.status === activeFilter.toLowerCase();
+  });
 
   return (
-    <div className="min-h-screen overflow-y-auto">
-      <Header />
-
-      {/* Hero Section */}
-      <section className="relative pt-32 pb-20 px-6">
-        <div className="max-w-5xl mx-auto text-center">
-          {/* Badge */}
-          <motion.div
-            initial={{ opacity: 0, y: 20 }}
-            animate={{ opacity: 1, y: 0 }}
-            className="inline-flex items-center gap-2 px-4 py-2 rounded-full glass mb-8"
+    <div className="flex h-full">
+      {/* Sidebar */}
+      <aside
+        className={`sidebar h-full flex flex-col transition-all duration-300 ${
+          sidebarCollapsed ? "w-16" : "w-56"
+        }`}
+      >
+        {/* Logo */}
+        <div className="p-4 flex items-center justify-between">
+          {!sidebarCollapsed && (
+            <div className="flex items-center gap-2">
+              <div className="w-8 h-8 rounded-lg bg-[var(--accent)] flex items-center justify-center">
+                <Zap className="w-5 h-5 text-white" />
+              </div>
+              <span className="font-semibold text-sm">MVPMAKER</span>
+            </div>
+          )}
+          <button
+            onClick={() => setSidebarCollapsed(!sidebarCollapsed)}
+            className="btn-ghost p-2 rounded-lg"
           >
-            <Sparkles className="w-4 h-4 text-violet-400" />
-            <span className="text-sm text-zinc-300">Powered by Claude, Groq & more</span>
-          </motion.div>
-
-          {/* Headline */}
-          <motion.h1
-            initial={{ opacity: 0, y: 20 }}
-            animate={{ opacity: 1, y: 0 }}
-            transition={{ delay: 0.1 }}
-            className="text-5xl md:text-7xl font-bold mb-6 leading-tight"
-          >
-            Build MVPs at
-            <br />
-            <span className="gradient-text">Lightning Speed</span>
-          </motion.h1>
-
-          {/* Subheadline */}
-          <motion.p
-            initial={{ opacity: 0, y: 20 }}
-            animate={{ opacity: 1, y: 0 }}
-            transition={{ delay: 0.2 }}
-            className="text-xl text-zinc-400 mb-12 max-w-2xl mx-auto"
-          >
-            Describe your idea, upload references, and watch as AI builds your
-            complete, launch-ready application in real-time.
-          </motion.p>
-
-          {/* Main Input */}
-          <motion.div
-            initial={{ opacity: 0, y: 20 }}
-            animate={{ opacity: 1, y: 0 }}
-            transition={{ delay: 0.3 }}
-            className="max-w-3xl mx-auto"
-            onMouseEnter={() => setIsHovered(true)}
-            onMouseLeave={() => setIsHovered(false)}
-          >
-            <div
-              className={`glass rounded-2xl p-2 transition-all duration-300 ${
-                isHovered ? "glow" : ""
+            <ChevronLeft
+              className={`w-4 h-4 transition-transform ${
+                sidebarCollapsed ? "rotate-180" : ""
               }`}
+            />
+          </button>
+        </div>
+
+        {/* Navigation */}
+        <nav className="flex-1 p-3 space-y-1">
+          {navItems.map((item) => (
+            <button
+              key={item.id}
+              onClick={() => setActiveNav(item.id)}
+              className={`nav-item w-full ${activeNav === item.id ? "active" : ""}`}
             >
+              <item.icon className="icon flex-shrink-0" />
+              {!sidebarCollapsed && <span>{item.label}</span>}
+            </button>
+          ))}
+        </nav>
+
+        {/* Theme Switcher */}
+        <div className="p-4 border-t border-[var(--border)]">
+          {!sidebarCollapsed && (
+            <div className="mb-3">
+              <span className="text-xs text-secondary">Theme</span>
+            </div>
+          )}
+          <ThemeSwitcher />
+        </div>
+      </aside>
+
+      {/* Main Content */}
+      <main className="flex-1 p-6 overflow-hidden">
+        <div className="h-full flex gap-6">
+          {/* Projects List Panel */}
+          <div className="glass-panel w-[420px] flex-shrink-0 flex flex-col animate-fadeIn">
+            {/* Header */}
+            <div className="p-5 border-b border-[var(--border)]">
+              <div className="flex items-center justify-between mb-4">
+                <h1 className="text-xl font-semibold">Projects</h1>
+                <button className="btn btn-primary">
+                  <Plus className="w-4 h-4" />
+                  New
+                </button>
+              </div>
+
+              {/* Search */}
               <div className="relative">
-                <Textarea
-                  value={prompt}
-                  onChange={(e) => setPrompt(e.target.value)}
-                  placeholder="Describe your MVP idea... e.g., 'A task management app with real-time collaboration, Kanban boards, and Slack integration'"
-                  className="min-h-[120px] bg-transparent border-0 focus:ring-0 text-lg"
-                  rows={4}
+                <Search className="absolute left-3 top-1/2 -translate-y-1/2 w-4 h-4 text-tertiary" />
+                <input
+                  type="text"
+                  placeholder="Search projects..."
+                  className="input pl-10"
                 />
-                <div className="flex items-center justify-between pt-2 border-t border-white/5">
-                  <div className="flex items-center gap-2">
-                    <Button variant="ghost" size="sm">
-                      <Upload className="w-4 h-4" />
-                      Upload
-                    </Button>
-                    <span className="text-xs text-zinc-500">
-                      Drop files, images, or code as reference
-                    </span>
-                  </div>
-                  <Link href="/build">
-                    <Button variant="glow" size="lg" disabled={!prompt.trim()}>
-                      <Play className="w-4 h-4" />
-                      Generate MVP
-                      <ArrowRight className="w-4 h-4" />
-                    </Button>
-                  </Link>
-                </div>
+              </div>
+
+              {/* Filters */}
+              <div className="flex gap-2 mt-4">
+                {filters.map((filter) => (
+                  <button
+                    key={filter}
+                    onClick={() => setActiveFilter(filter)}
+                    className={`badge cursor-pointer transition-all ${
+                      activeFilter === filter ? "badge-accent" : ""
+                    }`}
+                  >
+                    {filter}
+                  </button>
+                ))}
               </div>
             </div>
-          </motion.div>
 
-          {/* Quick stats */}
-          <motion.div
-            initial={{ opacity: 0 }}
-            animate={{ opacity: 1 }}
-            transition={{ delay: 0.5 }}
-            className="flex items-center justify-center gap-8 mt-12 text-sm text-zinc-500"
-          >
-            <div className="flex items-center gap-2">
-              <Cpu className="w-4 h-4 text-violet-400" />
-              <span>10,000+ MVPs built</span>
-            </div>
-            <div className="flex items-center gap-2">
-              <Rocket className="w-4 h-4 text-cyan-400" />
-              <span>Average build: 3 minutes</span>
-            </div>
-          </motion.div>
-        </div>
-      </section>
-
-      {/* Features */}
-      <section className="py-20 px-6">
-        <div className="max-w-6xl mx-auto">
-          <motion.div
-            initial={{ opacity: 0 }}
-            whileInView={{ opacity: 1 }}
-            viewport={{ once: true }}
-            className="text-center mb-16"
-          >
-            <h2 className="text-3xl md:text-4xl font-bold mb-4">
-              Everything you need to ship fast
-            </h2>
-            <p className="text-zinc-400 max-w-xl mx-auto">
-              From idea to deployed product in minutes. No configuration, no
-              boilerplate, just results.
-            </p>
-          </motion.div>
-
-          <div className="grid md:grid-cols-2 lg:grid-cols-4 gap-6">
-            {features.map((feature, i) => (
-              <GlassCard key={feature.title} style={{ transitionDelay: `${i * 100}ms` }}>
-                <div className="w-12 h-12 rounded-xl bg-gradient-to-br from-violet-500/20 to-cyan-500/20 flex items-center justify-center mb-4">
-                  <feature.icon className="w-6 h-6 text-violet-400" />
-                </div>
-                <h3 className="font-semibold text-lg mb-2">{feature.title}</h3>
-                <p className="text-sm text-zinc-400">{feature.description}</p>
-              </GlassCard>
-            ))}
-          </div>
-        </div>
-      </section>
-
-      {/* Pricing */}
-      <section className="py-20 px-6">
-        <div className="max-w-5xl mx-auto">
-          <motion.div
-            initial={{ opacity: 0 }}
-            whileInView={{ opacity: 1 }}
-            viewport={{ once: true }}
-            className="text-center mb-16"
-          >
-            <h2 className="text-3xl md:text-4xl font-bold mb-4">
-              Simple, transparent pricing
-            </h2>
-            <p className="text-zinc-400">
-              Start free, upgrade when you need more power
-            </p>
-          </motion.div>
-
-          <div className="grid md:grid-cols-3 gap-6">
-            {tiers.map((tier) => (
-              <GlassCard
-                key={tier.name}
-                hover={false}
-                glow={tier.popular}
-                className={tier.popular ? "border-violet-500/30 relative" : ""}
-              >
-                {tier.popular && (
-                  <div className="absolute -top-3 left-1/2 -translate-x-1/2 px-3 py-1 bg-violet-500 rounded-full text-xs font-medium">
-                    Most Popular
-                  </div>
-                )}
-                <div className="mb-6">
-                  <h3 className="font-semibold text-lg mb-1">{tier.name}</h3>
-                  <p className="text-sm text-zinc-500">{tier.description}</p>
-                </div>
-                <div className="mb-6">
-                  <span className="text-4xl font-bold">{tier.price}</span>
-                  {tier.period && (
-                    <span className="text-zinc-500">{tier.period}</span>
-                  )}
-                </div>
-                <ul className="space-y-3 mb-8">
-                  {tier.features.map((feature) => (
-                    <li key={feature} className="flex items-center gap-2 text-sm">
-                      <Check className="w-4 h-4 text-violet-400" />
-                      <span className="text-zinc-300">{feature}</span>
-                    </li>
-                  ))}
-                </ul>
-                <Button
-                  variant={tier.popular ? "glow" : "outline"}
-                  className="w-full"
+            {/* Project List */}
+            <div className="flex-1 overflow-y-auto p-3 space-y-2 stagger-children">
+              {filteredProjects.map((project) => (
+                <div
+                  key={project.id}
+                  onClick={() => setSelectedProject(project.id)}
+                  className={`floating-card p-4 cursor-pointer ${
+                    selectedProject === project.id ? "active" : ""
+                  }`}
                 >
-                  {tier.cta}
-                </Button>
-              </GlassCard>
-            ))}
-          </div>
-        </div>
-      </section>
-
-      {/* CTA */}
-      <section className="py-20 px-6">
-        <div className="max-w-3xl mx-auto text-center">
-          <GlassCard hover={false} glow className="py-12">
-            <h2 className="text-3xl md:text-4xl font-bold mb-4">
-              Ready to build your MVP?
-            </h2>
-            <p className="text-zinc-400 mb-8">
-              Join thousands of founders shipping faster with AI
-            </p>
-            <Link href="/build">
-              <Button variant="glow" size="lg">
-                <Sparkles className="w-5 h-5" />
-                Start Building for Free
-                <ArrowRight className="w-5 h-5" />
-              </Button>
-            </Link>
-          </GlassCard>
-        </div>
-      </section>
-
-      {/* Footer */}
-      <footer className="py-8 px-6 border-t border-white/5">
-        <div className="max-w-6xl mx-auto flex flex-col md:flex-row items-center justify-between gap-4">
-          <div className="flex items-center gap-2">
-            <div className="w-6 h-6 rounded bg-gradient-to-br from-violet-500 to-cyan-500 flex items-center justify-center">
-              <Zap className="w-4 h-4 text-white" />
+                  <div className="flex items-start justify-between mb-2">
+                    <h3 className="font-medium text-sm">{project.name}</h3>
+                    <button className="btn-ghost p-1 rounded opacity-0 group-hover:opacity-100 transition-opacity">
+                      <X className="w-3 h-3" />
+                    </button>
+                  </div>
+                  <p className="text-xs text-secondary line-clamp-2 mb-3">
+                    {project.description}
+                  </p>
+                  <div className="flex items-center justify-between">
+                    <span className="text-xs text-tertiary">{project.updatedAt}</span>
+                    <span
+                      className={`text-xs px-2 py-0.5 rounded-full ${
+                        project.status === "active"
+                          ? "bg-green-500/10 text-green-400"
+                          : project.status === "completed"
+                          ? "bg-blue-500/10 text-blue-400"
+                          : "bg-zinc-500/10 text-zinc-400"
+                      }`}
+                    >
+                      {project.status}
+                    </span>
+                  </div>
+                </div>
+              ))}
             </div>
-            <span className="text-sm text-zinc-500">
-              2025 MVPMAKER.AI. All rights reserved.
-            </span>
           </div>
-          <div className="flex items-center gap-6 text-sm text-zinc-500">
-            <Link href="/privacy" className="hover:text-white transition-colors">
-              Privacy
-            </Link>
-            <Link href="/terms" className="hover:text-white transition-colors">
-              Terms
-            </Link>
-            <Link href="/docs" className="hover:text-white transition-colors">
-              Docs
-            </Link>
+
+          {/* Detail Panel */}
+          <div className="glass-panel flex-1 flex flex-col animate-fadeIn" style={{ animationDelay: "0.1s" }}>
+            {selectedProject ? (
+              <>
+                {/* Detail Header */}
+                <div className="p-5 border-b border-[var(--border)]">
+                  <div className="flex items-center justify-between">
+                    <div>
+                      <h2 className="text-lg font-semibold mb-1">
+                        {mockProjects.find((p) => p.id === selectedProject)?.name}
+                      </h2>
+                      <p className="text-sm text-secondary">
+                        {mockProjects.find((p) => p.id === selectedProject)?.description}
+                      </p>
+                    </div>
+                    <button className="btn btn-secondary">
+                      <Sparkles className="w-4 h-4" />
+                      Generate
+                    </button>
+                  </div>
+                </div>
+
+                {/* Detail Content */}
+                <div className="flex-1 p-5 overflow-y-auto">
+                  <div className="grid grid-cols-2 gap-4">
+                    {/* Quick Actions */}
+                    <div className="floating-card p-4">
+                      <h3 className="text-sm font-medium mb-3">Quick Actions</h3>
+                      <div className="space-y-2">
+                        <button className="btn btn-ghost w-full justify-start text-sm">
+                          <Sparkles className="w-4 h-4" />
+                          Generate with AI
+                        </button>
+                        <button className="btn btn-ghost w-full justify-start text-sm">
+                          <FolderKanban className="w-4 h-4" />
+                          View Files
+                        </button>
+                        <button className="btn btn-ghost w-full justify-start text-sm">
+                          <Settings className="w-4 h-4" />
+                          Settings
+                        </button>
+                      </div>
+                    </div>
+
+                    {/* Stats */}
+                    <div className="floating-card p-4">
+                      <h3 className="text-sm font-medium mb-3">Statistics</h3>
+                      <div className="space-y-3">
+                        <div className="flex justify-between items-center">
+                          <span className="text-sm text-secondary">Files</span>
+                          <span className="text-sm font-medium">24</span>
+                        </div>
+                        <div className="flex justify-between items-center">
+                          <span className="text-sm text-secondary">Lines of Code</span>
+                          <span className="text-sm font-medium">3,421</span>
+                        </div>
+                        <div className="flex justify-between items-center">
+                          <span className="text-sm text-secondary">AI Generations</span>
+                          <span className="text-sm font-medium">12</span>
+                        </div>
+                      </div>
+                    </div>
+
+                    {/* Recent Activity */}
+                    <div className="floating-card p-4 col-span-2">
+                      <h3 className="text-sm font-medium mb-3">Recent Activity</h3>
+                      <div className="space-y-3">
+                        {[
+                          { action: "Generated landing page", time: "2 hours ago" },
+                          { action: "Updated API routes", time: "5 hours ago" },
+                          { action: "Added authentication", time: "1 day ago" },
+                        ].map((activity, i) => (
+                          <div key={i} className="flex items-center justify-between py-2 border-b border-[var(--border)] last:border-0">
+                            <span className="text-sm">{activity.action}</span>
+                            <span className="text-xs text-tertiary">{activity.time}</span>
+                          </div>
+                        ))}
+                      </div>
+                    </div>
+                  </div>
+                </div>
+              </>
+            ) : (
+              <div className="flex-1 flex items-center justify-center">
+                <div className="text-center">
+                  <div className="w-16 h-16 rounded-2xl bg-[var(--surface)] flex items-center justify-center mx-auto mb-4">
+                    <FolderKanban className="w-8 h-8 text-tertiary" />
+                  </div>
+                  <p className="text-secondary">Select a project to view details</p>
+                </div>
+              </div>
+            )}
           </div>
         </div>
-      </footer>
+      </main>
     </div>
   );
 }
