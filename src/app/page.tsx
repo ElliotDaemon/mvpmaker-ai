@@ -1,6 +1,6 @@
 "use client";
 
-import { useState, useCallback, useRef } from "react";
+import { useState, useCallback, useRef, useEffect } from "react";
 import { motion, AnimatePresence } from "framer-motion";
 import {
   Zap,
@@ -23,7 +23,36 @@ import {
   inferCurrentStep,
 } from "@/lib/mvp-builder";
 
+// Custom hook for reactive cursor glow effect
+function useCursorGlow() {
+  useEffect(() => {
+    const handleMouseMove = (e: MouseEvent) => {
+      const x = e.clientX;
+      const y = e.clientY;
+
+      // Update CSS custom properties for global cursor position
+      document.documentElement.style.setProperty('--cursor-x', `${x}px`);
+      document.documentElement.style.setProperty('--cursor-y', `${y}px`);
+
+      // Find all reactive-glow elements and update their local mouse position
+      const glowElements = document.querySelectorAll('.reactive-glow');
+      glowElements.forEach((el) => {
+        const rect = (el as HTMLElement).getBoundingClientRect();
+        const relX = ((x - rect.left) / rect.width) * 100;
+        const relY = ((y - rect.top) / rect.height) * 100;
+        (el as HTMLElement).style.setProperty('--mouse-x', `${relX}%`);
+        (el as HTMLElement).style.setProperty('--mouse-y', `${relY}%`);
+      });
+    };
+
+    window.addEventListener('mousemove', handleMouseMove);
+    return () => window.removeEventListener('mousemove', handleMouseMove);
+  }, []);
+}
+
 export default function Home() {
+  // Initialize cursor glow effect
+  useCursorGlow();
   // Chat state
   const [messages, setMessages] = useState<Message[]>([]);
   const [isGenerating, setIsGenerating] = useState(false);
@@ -225,10 +254,13 @@ export default function Home() {
 
   return (
     <div className="flex h-full">
+      {/* Cursor glow effect - hidden on mobile/touch devices */}
+      <div className="cursor-glow hidden lg:block" aria-hidden="true" />
+
       {/* Main Content */}
       <div className="flex-1 flex flex-col h-full overflow-hidden">
         {/* Header */}
-        <header className="flex items-center justify-between px-4 sm:px-6 py-3 sm:py-4 border-b border-[var(--border)] bg-[var(--surface)]/50 backdrop-blur-xl">
+        <header className="flex items-center justify-between px-4 sm:px-6 py-3 sm:py-4 border-b border-[var(--border)] bg-[var(--surface)]/50 backdrop-blur-xl reactive-glow">
           <div className="flex items-center gap-3 sm:gap-4">
             <motion.div
               initial={{ scale: 0 }}
